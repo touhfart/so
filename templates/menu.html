@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}قائمة الطعام - {{ restaurant.name }}{% endblock %}
+
+{% block content %}
+<!-- شريط البحث -->
+<section class="search-section">
+    <div class="search-box">
+        <i class='bx bx-search'></i>
+        <input 
+            type="text" 
+            id="search-input" 
+            placeholder="ابحث عن طبق..." 
+            value="{{ search_query }}"
+            autocomplete="off"
+        >
+        {% if search_query %}
+        <button class="search-box__clear" id="clear-search">
+            <i class='bx bx-x'></i>
+        </button>
+        {% endif %}
+    </div>
+</section>
+
+<!-- تصفية الأقسام -->
+<nav class="categories">
+    <div class="categories__container">
+        <a href="{% url 'menu' %}" class="category-btn {% if not selected_category %}active{% endif %}">
+            <i class='bx bx-food-menu'></i>
+            <span>الكل</span>
+        </a>
+        {% for category in categories %}
+        <a href="?category={{ category.id }}" class="category-btn {% if selected_category == category.id|stringformat:'s' %}active{% endif %}">
+            <i class='bx {{ category.icon }}'></i>
+            <span>{{ category.name }}</span>
+        </a>
+        {% endfor %}
+    </div>
+</nav>
+
+<!-- قائمة المنتجات -->
+<section class="menu-section">
+    {% if items %}
+    <div class="menu-grid">
+        {% for item in items %}
+        <article class="card" data-id="{{ item.id }}">
+            <div class="card__image-container">
+                <img 
+                    src="{{ item.image.url }}" 
+                    alt="{{ item.name }}" 
+                    class="card__image"
+                    loading="lazy"
+                >
+                {% if item.is_featured %}
+                <span class="card__badge card__badge--featured">مميز</span>
+                {% endif %}
+                {% if item.is_spicy %}
+                <span class="card__badge card__badge--spicy">🌶️</span>
+                {% endif %}
+                {% if item.is_vegetarian %}
+                <span class="card__badge card__badge--veg">🥬</span>
+                {% endif %}
+            </div>
+            
+            <div class="card__content">
+                <h3 class="card__title">{{ item.name }}</h3>
+                {% if item.description %}
+                <p class="card__desc">{{ item.description|truncatewords:10 }}</p>
+                {% endif %}
+                <div class="card__price">{{ item.price }} درهم</div>
+            </div>
+            
+            <div class="card__actions">
+                <a href="{% url 'order_whatsapp' item.id %}" class="card__btn card__btn--whatsapp" title="طلب عبر واتساب">
+                    <i class='bx bxl-whatsapp'></i>
+                </a>
+                <button class="card__btn card__btn--cart" data-id="{{ item.id }}" title="أضف للسلة">
+                    <i class='bx bx-cart-add'></i>
+                    <span>أضف</span>
+                </button>
+            </div>
+            
+            <!-- أزرار الكمية (تظهر بعد الإضافة) -->
+            <div class="card__quantity hidden" id="qty-{{ item.id }}">
+                <button class="qty-btn qty-btn--minus" data-id="{{ item.id }}">
+                    <i class='bx bx-minus'></i>
+                </button>
+                <span class="qty-value" id="qty-value-{{ item.id }}">0</span>
+                <button class="qty-btn qty-btn--plus" data-id="{{ item.id }}">
+                    <i class='bx bx-plus'></i>
+                </button>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- لا توجد نتائج -->
+    <div class="empty-state">
+        <i class='bx bx-search-alt'></i>
+        <p>لا توجد نتائج مطابقة</p>
+        <a href="{% url 'menu' %}" class="btn btn--primary">عرض الكل</a>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// البحث المباشر
+const searchInput = document.getElementById('search-input');
+let searchTimeout;
+
+searchInput?.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        const query = e.target.value.trim();
+        const url = new URL(window.location);
+        if (query) {
+            url.searchParams.set('search', query);
+        } else {
+            url.searchParams.delete('search');
+        }
+        window.location = url;
+    }, 500);
+});
+
+// مسح البحث
+document.getElementById('clear-search')?.addEventListener('click', () => {
+    const url = new URL(window.location);
+    url.searchParams.delete('search');
+    window.location = url;
+});
+</script>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}من نحن - {{ restaurant.name }}{% endblock %}
+
+{% block content %}
+<section class="about">
+    <div class="about__header">
+        <h1 class="about__title">{{ restaurant.name }}</h1>
+        <p class="about__subtitle">أشهى الأطباق المغربية</p>
+    </div>
+    
+    <div class="about__content">
+        <div class="about__card">
+            <i class='bx bx-time'></i>
+            <h3>ساعات العمل</h3>
+            <p>كل يوم من 10:00 ص إلى 11:00 م</p>
+        </div>
+        
+        <div class="about__card">
+            <i class='bx bx-map'></i>
+            <h3>العنوان</h3>
+            <p>{{ restaurant.address }}</p>
+        </div>
+        
+        <div class="about__card">
+            <i class='bx bx-phone'></i>
+            <h3>اتصل بنا</h3>
+            <p dir="ltr">{{ restaurant.phone }}</p>
+        </div>
+    </div>
+    
+    <div class="about__actions">
+        <a href="{% url 'menu' %}" class="btn btn--primary btn--lg">
+            <i class='bx bx-food-menu'></i>
+            عرض القائمة
+        </a>
+    </div>
+</section>
+{% endblock %}

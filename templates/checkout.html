@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}إتمام الطلب - {{ restaurant.name }}{% endblock %}
+
+{% block content %}
+<section class="checkout">
+    <div class="checkout__header">
+        <a href="{% url 'menu' %}" class="checkout__back">
+            <i class='bx bx-arrow-right'></i>
+        </a>
+        <h1 class="checkout__title">إتمام الطلب</h1>
+    </div>
+    
+    <!-- ملخص الطلب -->
+    <div class="checkout__summary">
+        <h2 class="checkout__section-title">ملخص الطلب</h2>
+        <div class="checkout__items">
+            {% for item in cart.items.all %}
+            <div class="checkout__item">
+                <span class="checkout__item-qty">{{ item.quantity }}x</span>
+                <span class="checkout__item-name">{{ item.menu_item.name }}</span>
+                <span class="checkout__item-price">{{ item.subtotal }} درهم</span>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="checkout__total">
+            <span>المجموع</span>
+            <strong>{{ cart.total }} درهم</strong>
+        </div>
+    </div>
+    
+    <!-- نموذج الطلب -->
+    <form class="checkout__form" id="checkout-form">
+        <h2 class="checkout__section-title">معلومات التوصيل</h2>
+        
+        <div class="form-group">
+            <label for="name">الاسم *</label>
+            <input type="text" id="name" name="name" required placeholder="اسمك الكامل">
+        </div>
+        
+        <div class="form-group">
+            <label for="phone">رقم الهاتف *</label>
+            <input type="tel" id="phone" name="phone" required placeholder="06XXXXXXXX" dir="ltr">
+        </div>
+        
+        <div class="form-group">
+            <label>نوع الاستلام *</label>
+            <div class="radio-group">
+                <label class="radio-option">
+                    <input type="radio" name="delivery_type" value="pickup" checked>
+                    <span class="radio-option__label">
+                        <i class='bx bx-store'></i>
+                        استلام من المطعم
+                    </span>
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="delivery_type" value="delivery">
+                    <span class="radio-option__label">
+                        <i class='bx bx-cycling'></i>
+                        توصيل للمنزل
+                    </span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="form-group" id="address-group" style="display: none;">
+            <label for="address">العنوان *</label>
+            <textarea id="address" name="address" rows="2" placeholder="العنوان بالتفصيل"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="notes">ملاحظات إضافية</label>
+            <textarea id="notes" name="notes" rows="2" placeholder="أي ملاحظات على الطلب..."></textarea>
+        </div>
+        
+        <button type="submit" class="btn btn--primary btn--lg btn--full" id="submit-btn">
+            <i class='bx bxl-whatsapp'></i>
+            أكمل الطلب عبر واتساب
+        </button>
+    </form>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const form = document.getElementById('checkout-form');
+const addressGroup = document.getElementById('address-group');
+const deliveryInputs = document.querySelectorAll('input[name="delivery_type"]');
+
+// إظهار/إخفاء حقل العنوان
+deliveryInputs.forEach(input => {
+    input.addEventListener('change', () => {
+        addressGroup.style.display = input.value === 'delivery' ? 'block' : 'none';
+        document.getElementById('address').required = input.value === 'delivery';
+    });
+});
+
+// إرسال الطلب
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> جاري الإرسال...';
+    
+    const formData = new FormData(form);
+    const data = {
+        name: formData.get('name'),
+        phone: formData.get('phone'),
+        delivery_type: formData.get('delivery_type'),
+        address: formData.get('address') || '',
+        notes: formData.get('notes') || '',
+    };
+    
+    try {
+        const response = await fetch('/api/order/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': CSRF_TOKEN,
+            },
+            body: JSON.stringify(data),
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            window.location.href = result.whatsapp_url;
+        } else {
+            alert(result.error || 'حدث خطأ');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bx bxl-whatsapp"></i> أكمل الطلب عبر واتساب';
+        }
+    } catch (error) {
+        alert('حدث خطأ في الاتصال');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bx bxl-whatsapp"></i> أكمل الطلب عبر واتساب';
+    }
+});
+</script>
+{% endblock %}

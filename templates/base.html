@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="قائمة طعام مطعم {{ restaurant.name }} - أشهى الأطباق المغربية">
+    <meta name="theme-color" content="#556B2F">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% block og_title %}{{ restaurant.name }}{% endblock %}">
+    <meta property="og:description" content="استمتع بأشهى الأطباق في مطعم {{ restaurant.name }}">
+    <meta property="og:type" content="website">
+    
+    <title>{% block title %}{{ restaurant.name }}{% endblock %}</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Changa:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header__container">
+            <a href="{% url 'menu' %}" class="header__logo">{{ restaurant.name }}</a>
+            <nav class="header__nav">
+                <a href="{% url 'menu' %}" class="header__link {% if request.resolver_match.url_name == 'menu' %}active{% endif %}">القائمة</a>
+                <a href="{% url 'about' %}" class="header__link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">من نحن</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- محتوى الصفحة -->
+    <main class="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- أيقونة السلة الثابتة -->
+    <button class="cart-fab" id="cart-fab" aria-label="السلة">
+        <i class='bx bx-cart'></i>
+        <span class="cart-fab__count" id="cart-count">{{ cart_count }}</span>
+    </button>
+
+    <!-- زر العودة للأعلى -->
+    <button class="scroll-top" id="scroll-top" aria-label="العودة للأعلى">
+        <i class='bx bx-chevron-up'></i>
+    </button>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <a href="tel:{{ restaurant.phone }}" class="footer__link">
+            <i class='bx bxs-phone'></i>
+            <span>اتصل</span>
+        </a>
+        <a href="https://wa.me/{{ restaurant.whatsapp|cut:'+' }}" target="_blank" class="footer__link footer__link--whatsapp">
+            <i class='bx bxl-whatsapp'></i>
+            <span>واتساب</span>
+        </a>
+        <a href="{{ restaurant.maps }}" target="_blank" class="footer__link">
+            <i class='bx bxs-map'></i>
+            <span>الموقع</span>
+        </a>
+    </footer>
+
+    <!-- Modal السلة -->
+    <div class="modal" id="cart-modal">
+        <div class="modal__backdrop" id="modal-backdrop"></div>
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2 class="modal__title">
+                    <i class='bx bx-cart'></i>
+                    سلة التسوق
+                </h2>
+                <button class="modal__close" id="modal-close">
+                    <i class='bx bx-x'></i>
+                </button>
+            </div>
+            <div class="modal__body" id="cart-content">
+                {% include 'partials/_cart_content.html' %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast الإشعارات -->
+    <div class="toast" id="toast">
+        <i class='bx bx-check-circle'></i>
+        <span id="toast-message">تمت الإضافة</span>
+    </div>
+
+    <!-- CSRF Token -->
+    <script>
+        const CSRF_TOKEN = '{{ csrf_token }}';
+    </script>
+    
+    <script src="{% static 'js/app.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
