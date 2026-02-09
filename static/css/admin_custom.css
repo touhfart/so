@@ -1,0 +1,96 @@
+/* === تحسينات لوحة التحكم للهواتف === */
+
+/* تحسين الجداول للعرض على الشاشات الصغيرة */
+@media (max-width: 768px) {
+
+    /* جعل الجداول قابلة للتمرير أفقياً بسلاسة */
+    .card-body.table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* تحسين حجم الخط في الجداول */
+    .table td,
+    .table th {
+        font-size: 0.85rem;
+        white-space: nowrap;
+        /* منع التفاف النصوص الطويلة */
+        padding: 0.5rem;
+    }
+
+    /* تحسين أزرار الإجراءات */
+    .btn-group-sm>.btn,
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    /* تحسين المسافات في النماذج */
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    /* تكبير حقول الإدخال لتكون أسهل للمس */
+    .form-control {
+        font-size: 16px;
+        /* يمنع التكبير التلقائي في iOS */
+        padding: 0.5rem;
+    }
+
+    /* تحسين القائمة الجانبية (Sidebar) */
+    .main-sidebar {
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* تحسينات الهيدر */
+    .navbar-expand .navbar-nav .nav-link {
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+
+    /* تحسين أزرار الحفظ في الأسفل */
+    .submit-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .submit-row input,
+    .submit-row a,
+    .submit-row button {
+        width: 100%;
+        margin: 0 !important;
+        height: 44px;
+        /* ارتفاع مناسب للمس */
+    }
+}
+
+/* تحسينات عامة */
+.brand-link .brand-image {
+    opacity: 1 !important;
+    max-height: 35px;
+}
+
+/* ألوان مخصصة لتتماشى مع الهوية البصرية */
+.main-header.navbar {
+    background-color: #556B2F !important;
+    /* لون الزيتوني */
+}
+
+.main-sidebar {
+    background-color: #343a40 !important;
+}
+
+.btn-primary {
+    background-color: #556B2F !important;
+    border-color: #556B2F !important;
+}
+
+.btn-primary:hover {
+    background-color: #3D4F22 !important;
+    border-color: #3D4F22 !important;
+}
+
+.page-item.active .page-link {
+    background-color: #556B2F !important;
+    border-color: #556B2F !important;
+}
